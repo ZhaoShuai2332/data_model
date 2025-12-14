@@ -1,1 +1,2 @@
 # data_model
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126 

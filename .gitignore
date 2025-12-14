@@ -1,0 +1,15 @@
+test.csv
+train.csv
+mlp_model/__pycache__/data_preprocess.cpython-311.pyc
+mlp_model/__pycache__/mlp.cpython-311.pyc
+mlp_model/__pycache__/train.cpython-311.pyc
+cnn_model/__pycache__/data_process.cpython-311.pyc
+cnn_model/__pycache__/evaluate.cpython-311.pyc
+cnn_model/__pycache__/res_net.cpython-311.pyc
+cnn_model/__pycache__/train.cpython-311.pyc
+svm_model/__pycache__/config.cpython-311.pyc
+svm_model/__pycache__/data_process.cpython-311.pyc
+svm_model/__pycache__/svm_trainer.cpython-311.pyc
+logistic_model/__pycache__/config.cpython-311.pyc
+logistic_model/__pycache__/data_process.cpython-311.pyc
+logistic_model/__pycache__/logistic_trainer.cpython-311.pyc

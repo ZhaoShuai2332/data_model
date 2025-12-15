@@ -1,5 +1,5 @@
-test.csv
-train.csv
+# test.csv
+# train.csv
 mlp_model/__pycache__/data_preprocess.cpython-311.pyc
 mlp_model/__pycache__/mlp.cpython-311.pyc
 mlp_model/__pycache__/train.cpython-311.pyc

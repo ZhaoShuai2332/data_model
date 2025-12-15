@@ -6,12 +6,12 @@ REM
 REM Description:
 REM   This script serves as the unified entry point for running various machine
 REM   learning models in the data classification project. It supports multiple
-REM   model architectures including CNN, MLP, Logistic Regression, SVM, and
+REM   model architectures including MLP, Logistic Regression, SVM, and
 REM   Transformer-based approaches.
 REM
 REM Author: Data Modeling Team
 REM Date: December 2025
-REM Version: 1.0
+REM Version: 1.1
 REM
 REM Usage:
 REM   run_model.bat <model_name>      Run a specific model
@@ -19,7 +19,6 @@ REM   run_model.bat all               Run all models sequentially
 REM   run_model.bat help              Display help information
 REM
 REM Available Models:
-REM   cnn          - Convolutional Neural Network (ResNet1D architecture)
 REM   mlp          - Multi-Layer Perceptron
 REM   logistic     - Logistic Regression classifier
 REM   svm          - Support Vector Machine
@@ -101,7 +100,6 @@ echo SYNOPSIS:
 echo     run_model.bat ^<model_name^>
 echo.
 echo AVAILABLE MODELS:
-echo     cnn          - Convolutional Neural Network (ResNet1D architecture)
 echo     mlp          - Multi-Layer Perceptron
 echo     logistic     - Logistic Regression classifier
 echo     svm          - Support Vector Machine
@@ -112,7 +110,7 @@ echo OPTIONS:
 echo     help, -h, --help    Display this help message
 echo.
 echo EXAMPLES:
-echo     run_model.bat cnn           # Train CNN model
+echo     run_model.bat mlp           # Train MLP model
 echo     run_model.bat logistic      # Train Logistic Regression model
 echo     run_model.bat all           # Run all models for comparison
 echo.
@@ -148,11 +146,6 @@ set "script="
 set "name="
 
 REM Map model identifier to script path and display name
-if /i "%model%"=="cnn" (
-    set "script=cnn_model\execute.py"
-    set "name=CNN (ResNet1D)"
-    goto :run_model_execute
-)
 
 if /i "%model%"=="mlp" (
     set "script=mlp_model\execute.py"
@@ -225,11 +218,10 @@ REM ============================================================================
 call :print_header "Running All Models - Comparative Evaluation"
 
 echo [INFO] This will execute all available models sequentially.
-echo [INFO] Total models to run: 5
+echo [INFO] Total models to run: 4
 echo.
 
 REM Initialize result tracking
-set "result_cnn=0"
 set "result_mlp=0"
 set "result_logistic=0"
 set "result_svm=0"
@@ -237,32 +229,27 @@ set "result_transformer=0"
 set "failed_count=0"
 
 REM Execute each model
-echo.
-echo [PROGRESS] Running model 1 of 5: CNN (ResNet1D)
-call :run_model cnn
-set "result_cnn=%ERRORLEVEL%"
-if not %result_cnn%==0 set /a failed_count+=1
 
 echo.
-echo [PROGRESS] Running model 2 of 5: Multi-Layer Perceptron
+echo [PROGRESS] Running model 1 of 4: Multi-Layer Perceptron
 call :run_model mlp
 set "result_mlp=%ERRORLEVEL%"
 if not %result_mlp%==0 set /a failed_count+=1
 
 echo.
-echo [PROGRESS] Running model 3 of 5: Logistic Regression
+echo [PROGRESS] Running model 2 of 4: Logistic Regression
 call :run_model logistic
 set "result_logistic=%ERRORLEVEL%"
 if not %result_logistic%==0 set /a failed_count+=1
 
 echo.
-echo [PROGRESS] Running model 4 of 5: Support Vector Machine
+echo [PROGRESS] Running model 3 of 4: Support Vector Machine
 call :run_model svm
 set "result_svm=%ERRORLEVEL%"
 if not %result_svm%==0 set /a failed_count+=1
 
 echo.
-echo [PROGRESS] Running model 5 of 5: Transformer
+echo [PROGRESS] Running model 4 of 4: Transformer
 call :run_model transformer
 set "result_transformer=%ERRORLEVEL%"
 if not %result_transformer%==0 set /a failed_count+=1
@@ -275,12 +262,6 @@ echo ===========================================================================
 echo.
 echo   Model                          Status
 echo   ------------------------------  --------
-
-if !result_cnn!==0 (
-    echo   CNN ^(ResNet1D^)                  [PASS]
-) else (
-    echo   CNN ^(ResNet1D^)                  [FAIL]
-)
 
 if !result_mlp!==0 (
     echo   Multi-Layer Perceptron         [PASS]
@@ -306,11 +287,11 @@ if !result_transformer!==0 (
     echo   Transformer                    [FAIL]
 )
 
-set /a passed_count=5-failed_count
+set /a passed_count=4-failed_count
 
 echo.
 echo   ------------------------------  --------
-echo   Total: 5 models ^| Passed: !passed_count! ^| Failed: !failed_count!
+echo   Total: 4 models ^| Passed: !passed_count! ^| Failed: !failed_count!
 echo.
 echo ================================================================================
 

@@ -6,12 +6,12 @@
 # Description:
 #   This script serves as the unified entry point for running various machine
 #   learning models in the data classification project. It supports multiple
-#   model architectures including CNN, MLP, Logistic Regression, SVM, and
+#   model architectures including MLP, Logistic Regression, SVM, and
 #   Transformer-based approaches.
 #
 # Author: Data Modeling Team
 # Date: December 2025
-# Version: 1.0
+# Version: 1.1
 #
 # Usage:
 #   ./run_model.sh <model_name>      Run a specific model
@@ -19,14 +19,13 @@
 #   ./run_model.sh help              Display help information
 #
 # Available Models:
-#   cnn          - Convolutional Neural Network (ResNet1D architecture)
 #   mlp          - Multi-Layer Perceptron
 #   logistic     - Logistic Regression classifier
 #   svm          - Support Vector Machine
 #   transformer  - Transformer-based model
 #
 # Examples:
-#   ./run_model.sh cnn               # Train and evaluate CNN model
+#   ./run_model.sh mlp               # Train and evaluate MLP model
 #   ./run_model.sh logistic          # Train and evaluate Logistic Regression
 #   ./run_model.sh all               # Run all models for comparison
 #
@@ -84,7 +83,6 @@ print_usage() {
     echo "    ./run_model.sh <model_name>"
     echo ""
     echo "AVAILABLE MODELS:"
-    echo "    cnn          - Convolutional Neural Network (ResNet1D architecture)"
     echo "    mlp          - Multi-Layer Perceptron"
     echo "    logistic     - Logistic Regression classifier"
     echo "    svm          - Support Vector Machine"
@@ -95,7 +93,7 @@ print_usage() {
     echo "    help, -h, --help    Display this help message"
     echo ""
     echo "EXAMPLES:"
-    echo "    ./run_model.sh cnn           # Train CNN model"
+    echo "    ./run_model.sh mlp           # Train MLP model"
     echo "    ./run_model.sh logistic      # Train Logistic Regression model"
     echo "    ./run_model.sh all           # Run all models for comparison"
     echo ""
@@ -125,10 +123,6 @@ run_model() {
     
     # Map model identifier to script path and display name
     case $model in
-        cnn)
-            script="cnn_model/execute.py"
-            name="CNN (ResNet1D)"
-            ;;
         mlp)
             script="mlp_model/execute.py"
             name="Multi-Layer Perceptron (MLP)"
@@ -193,12 +187,12 @@ run_all_models() {
     print_header "Running All Models - Comparative Evaluation"
     
     echo -e "${CYAN}[INFO] This will execute all available models sequentially.${NC}"
-    echo -e "${CYAN}[INFO] Total models to run: 5${NC}"
+    echo -e "${CYAN}[INFO] Total models to run: 4${NC}"
     echo ""
     
     # Define model list
-    local models=("cnn" "mlp" "logistic" "svm" "transformer")
-    local model_names=("CNN (ResNet1D)" "MLP" "Logistic Regression" "SVM" "Transformer")
+    local models=("mlp" "logistic" "svm" "transformer")
+    local model_names=("MLP" "Logistic Regression" "SVM" "Transformer")
     declare -A results
     local failed_count=0
     

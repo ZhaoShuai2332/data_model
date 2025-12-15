@@ -47,7 +47,7 @@ pip install -r requirements.txt
 
 ### 1.3 配置 PyTorch
 
-Transformer 与 CNN 模型基于 PyTorch 框架构建。为获得最佳训练性能，强烈建议安装 CUDA (GPU) 版本。
+Transformer 与 MLP 模型基于 PyTorch 框架构建。为获得最佳训练性能，强烈建议安装 CUDA (GPU) 版本。
 
 **CUDA (GPU) 版本 (推荐，需 NVIDIA 显卡):**
 ```bash
@@ -86,7 +86,6 @@ pip install torch torchvision torchaudio
 
 ```powershell
 # 运行单个模型
-.\run_model.bat cnn          # 训练 CNN (ResNet1D) 模型
 .\run_model.bat mlp          # 训练 MLP 模型
 .\run_model.bat logistic     # 训练 Logistic Regression 模型
 .\run_model.bat svm          # 训练 SVM 模型
@@ -108,7 +107,6 @@ pip install torch torchvision torchaudio
 chmod +x run_model.sh
 
 # 运行单个模型
-./run_model.sh cnn          # 训练 CNN (ResNet1D) 模型
 ./run_model.sh mlp          # 训练 MLP 模型
 ./run_model.sh logistic     # 训练 Logistic Regression 模型
 ./run_model.sh svm          # 训练 SVM 模型
@@ -125,14 +123,13 @@ chmod +x run_model.sh
 
 | 参数 | 模型 | 说明 |
 |------|------|------|
-| `cnn` | CNN (ResNet1D) | 一维卷积神经网络，基于 ResNet 架构 |
 | `mlp` | Multi-Layer Perceptron | 多层感知机 |
 | `logistic` | Logistic Regression | 逻辑回归分类器 |
 | `svm` | Support Vector Machine | 支持向量机 |
 | `transformer` | Transformer | 基于自注意力机制的模型 |
 | `all` | 全部模型 | 按顺序运行所有模型并生成对比报告 |
 
-> **💡 提示**: 使用 `all` 参数运行所有模型后，脚本会自动生成执行摘要，显示每个模型的运行状态（成功/失败）。
+> **💡 提示**: 使用 `all` 参数运行所有模型后，脚本会自动生成执行摘要，显示每个模型的运行状态（成功/失败）。各模型的 `outputs/` 目录包含训练结果、评估图表及 `feature_importance.csv/png` 特征重要性分析文件。
 
 ---
 
@@ -148,12 +145,6 @@ chmod +x run_model.sh
 **Transformer (Self-Attention)**
 ```bash
 cd transformer_model
-python execute.py
-```
-
-**CNN (ResNet-1D)**
-```bash
-cd cnn_model
 python execute.py
 ```
 
@@ -192,4 +183,4 @@ python execute.py
 > **A**: 可能是学习率 (Learning Rate) 设置不当或数据未标准化。本项目已内置 `StandardScaler` 标准化处理，请检查是否错误修改了预处理逻辑。
 
 **Q4: 如何查看训练结果？**
-> **A**: 模型训练完成后，评估结果 (图片、CSV、模型权重) 通常会保存在各模型目录下的 `outputs/` 文件夹中。
+> **A**: 模型训练完成后，评估结果 (图片、CSV、模型权重) 通常会保存在各模型目录下的 `outputs/` 文件夹中。其中 `feature_importance.csv` 和 `feature_importance.png` 包含特征重要性分析结果。

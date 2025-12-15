@@ -10,15 +10,15 @@ import warnings
 warnings.filterwarnings("ignore")
 from mlp import RiskPredictionNet, FocalLoss
 
-# 采用GPU对torch的网络模型进行加速训练
+# Use GPU to accelerate torch network training
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print(f"使用设备: {device}")
+print(f"Using device: {device}")
 
 """
-给出模型训练和预测的代码
+Code for model training and prediction
 """
 class RiskPredictor:
-    """模型训练和预测类"""
+    """Model training and prediction class"""
     
     def __init__(self, input_dim, hidden_dims=[256, 128, 64], 
                  dropout_rate=0.3, learning_rate=0.001, 
@@ -32,7 +32,7 @@ class RiskPredictor:
         
         self.optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
         
-        # 使用Focal Loss处理不平衡数据
+        # Use Focal Loss to handle unbalanced data
         if use_focal_loss:
             self.criterion = FocalLoss(alpha=0.25, gamma=2.0)
         else:
@@ -43,7 +43,7 @@ class RiskPredictor:
         self.val_aucs = []
     
     def train_epoch(self, train_loader):
-        """训练一个epoch"""
+        """Train one epoch"""
         self.model.train()
         total_loss = 0
         
@@ -51,11 +51,11 @@ class RiskPredictor:
             X_batch = X_batch.to(device)
             y_batch = y_batch.to(device)
             
-            # 前向传播
+            # Forward pass
             outputs = self.model(X_batch).squeeze()
             loss = self.criterion(outputs, y_batch)
             
-            # 反向传播
+            # Backward pass
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
@@ -65,7 +65,7 @@ class RiskPredictor:
         return total_loss / len(train_loader)
     
     def validate(self, val_loader):
-        """验证模型"""
+        """Validate model"""
         self.model.eval()
         total_loss = 0
         all_preds = []
@@ -83,7 +83,7 @@ class RiskPredictor:
                 all_preds.extend(outputs.cpu().numpy())
                 all_labels.extend(y_batch.cpu().numpy())
         
-        # 计算AUC
+        # Calculate AUC
         fpr, tpr, _ = roc_curve(all_labels, all_preds)
         roc_auc = auc(fpr, tpr)
         
@@ -93,9 +93,9 @@ class RiskPredictor:
     
     def fit(self, X_train, y_train, X_val, y_val, 
             epochs=50, batch_size=256, patience=10):
-        """训练模型"""
+        """Train model"""
         
-        # 创建数据加载器
+        # Create data loaders
         train_dataset = TensorDataset(
             torch.FloatTensor(X_train),
             torch.FloatTensor(y_train)
@@ -116,24 +116,24 @@ class RiskPredictor:
             shuffle=False
         )
         
-        print(f"\n开始训练模型...")
-        print(f"训练集样本数: {len(X_train)}, 验证集样本数: {len(X_val)}")
+        print(f"\nStarting model training...")
+        print(f"Training samples: {len(X_train)}, Validation samples: {len(X_val)}")
         
         best_auc = 0
         patience_counter = 0
         
         for epoch in range(epochs):
-            # 训练
+            # Training
             train_loss = self.train_epoch(train_loader)
             
-            # 验证
+            # Validation
             val_loss, val_auc, _, _ = self.validate(val_loader)
             
             self.train_losses.append(train_loss)
             self.val_losses.append(val_loss)
             self.val_aucs.append(val_auc)
             
-            # 打印进度
+            # Print progress
             if (epoch + 1) % 5 == 0:
                 print(f"Epoch [{epoch+1}/{epochs}] - "
                       f"Train Loss: {train_loss:.4f}, "
@@ -144,7 +144,7 @@ class RiskPredictor:
             if val_auc > best_auc:
                 best_auc = val_auc
                 patience_counter = 0
-                # 保存最佳模型
+                # Save best model
                 torch.save(self.model.state_dict(), 'mlp_model\\outputs\\best_model.pth')
             else:
                 patience_counter += 1
@@ -153,14 +153,14 @@ class RiskPredictor:
                 print(f"\nEarly stopping at epoch {epoch+1}")
                 break
         
-        # 加载最佳模型
+        # Load best model
         self.model.load_state_dict(torch.load('mlp_model\\outputs\\best_model.pth'))
-        print(f"\n训练完成！最佳验证AUC: {best_auc:.4f}")
+        print(f"\nTraining completed! Best validation AUC: {best_auc:.4f}")
         
         return best_auc
     
     def predict(self, X):
-        """预测概率"""
+        """Predict probabilities"""
         self.model.eval()
         
         dataset = TensorDataset(torch.FloatTensor(X))
@@ -177,10 +177,10 @@ class RiskPredictor:
         return np.array(predictions)
     
     def plot_training_history(self):
-        """绘制训练历史"""
+        """Plot training history"""
         fig, axes = plt.subplots(1, 2, figsize=(14, 5))
         
-        # 损失曲线
+        # Loss curve
         axes[0].plot(self.train_losses, label='Train Loss', alpha=0.8)
         axes[0].plot(self.val_losses, label='Val Loss', alpha=0.8)
         axes[0].set_xlabel('Epoch')
@@ -189,7 +189,7 @@ class RiskPredictor:
         axes[0].legend()
         axes[0].grid(True, alpha=0.3)
         
-        # AUC曲线
+        # AUC curve
         axes[1].plot(self.val_aucs, label='Val AUC', color='green', alpha=0.8)
         axes[1].set_xlabel('Epoch')
         axes[1].set_ylabel('AUC')
@@ -199,6 +199,6 @@ class RiskPredictor:
         
         plt.tight_layout()
         plt.savefig('mlp_model\\outputs\\training_history.png', dpi=150, bbox_inches='tight')
-        print("\n训练历史图已保存:  mlp_model\\outputs\\training_history.png")
+        print("\nTraining history plot saved to:  mlp_model\\outputs\\training_history.png")
         
         return fig

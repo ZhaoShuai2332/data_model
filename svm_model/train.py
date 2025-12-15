@@ -1,107 +1,214 @@
-import sys
-import os
-from sklearn.model_selection import train_test_split
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from svm import SVMModel
+from evaluate import MetricsCalculator
+from sklearn.metrics import confusion_matrix, classification_report, roc_curve, auc
 import joblib
-import matplotlib
-matplotlib.use('Agg')  # 使用非交互式后端
+import os
 
-# 添加项目路径
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+"""
+Code for model training and prediction.
+"""
 
-from data_process import DataPreprocessor
-from svm_trainer import SVMTrainer
-import config
-
-def main():
-    print("="*60)
-    print("SVM模型训练流程")
-    print("="*60)
+class SVMPredictor:
+    """SVM Trainer with F1-score monitoring."""
     
-    # 1. 初始化数据预处理器
-    preprocessor = DataPreprocessor()
-    
-    # 2. 加载和预处理训练数据
-    train_data = preprocessor.load_data(config.TRAIN_DATA_PATH)
-    X, y = preprocessor.preprocess_train(train_data)
-    
-    # 3. 划分训练集和验证集
-    X_train, X_val, y_train, y_val = train_test_split(
-        X, y, 
-        test_size=config.TEST_SIZE, 
-        random_state=config.RANDOM_STATE,
-        stratify=y
-    )
-    
-    print(f"\n训练集大小: {X_train.shape}")
-    print(f"验证集大小: {X_val.shape}")
-    print(f"训练集中正负样本比例: {(y_train==0).mean():.4f} / {(y_train==1).mean():.4f}")
-    print(f"验证集中正负样本比例: {(y_val==0).mean():.4f} / {(y_val==1).mean():.4f}")
-    
-    # 4. 初始化训练器
-    trainer = SVMTrainer(
-        params=config.SVM_PARAMS,
-        random_state=config.RANDOM_STATE
-    )
-    
-    # 5. 可选：网格搜索最优参数
-    if config.ENABLE_GRID_SEARCH:
-        print("\n警告: SVM网格搜索可能需要很长时间!")
-        best_params = trainer.grid_search(
-            X_train, y_train, 
-            config.GRID_SEARCH_PARAMS, 
-            cv=config.GRID_SEARCH_CV
+    def __init__(self, C=1.0, kernel='rbf', gamma='scale',
+                 probability=True, random_state=42, class_weight='balanced'):
+        """
+        Initialize the trainer.
+        
+        Args:
+            C: Regularization parameter.
+            kernel: Kernel function type.
+            gamma: Kernel coefficient.
+            probability: Whether to enable probability estimates.
+            random_state: Random seed.
+            class_weight: Weights associated with classes.
+        """
+        self.model = SVMModel(
+            C=C,
+            kernel=kernel,
+            gamma=gamma,
+            probability=probability,
+            random_state=random_state,
+            class_weight=class_weight
         )
-        print(f"\n使用网格搜索得到的最优参数进行训练...")
+        
+        self.metrics_calculator = MetricsCalculator()
+        self.train_metrics = None
+        self.val_metrics = None
     
-    # 6. 训练模型
-    history = trainer.train(X_train, y_train, X_val, y_val)
+    def fit(self, X_train, y_train, X_val=None, y_val=None):
+        """
+        Train the model.
+        
+        Args:
+            X_train: Training features.
+            y_train: Training labels.
+            X_val: Validation features.
+            y_val: Validation labels.
+        """
+        print(f"\nStarting SVM model training...")
+        print(f"Training set: {len(X_train)}, Validation set: {len(X_val) if X_val is not None else 0}")
+        
+        # Train model
+        self.model.fit(X_train, y_train)
+        
+        # Print support vectors info
+        n_support = self.model.get_n_support()
+        print(f"Number of support vectors: {sum(n_support)} (Class 0: {n_support[0]}, Class 1: {n_support[1]})")
+        
+        # Calculate training metrics
+        train_pred = self.model.predict(X_train)
+        train_pred_proba = self.model.predict_proba(X_train)[:, 1]
+        self.train_metrics = self.metrics_calculator.calculate_metrics(
+            y_train, train_pred, train_pred_proba
+        )
+        
+        print("\nTraining Set Evaluation Results:")
+        self._print_metrics(self.train_metrics)
+        
+        # Calculate validation metrics
+        if X_val is not None and y_val is not None:
+            val_pred = self.model.predict(X_val)
+            val_pred_proba = self.model.predict_proba(X_val)[:, 1]
+            self.val_metrics = self.metrics_calculator.calculate_metrics(
+                y_val, val_pred, val_pred_proba
+            )
+            
+            print("\nValidation Set Evaluation Results:")
+            self._print_metrics(self.val_metrics)
+            
+            return {
+                'train': self.train_metrics,
+                'val': self.val_metrics
+            }
+        
+        return {'train': self.train_metrics}
     
-    # 7. 保存模型和预处理器
-    os.makedirs(config.MODEL_SAVE_DIR, exist_ok=True)
+    def _print_metrics(self, metrics):
+        """Print evaluation metrics."""
+        print(f"  Accuracy:    {metrics['accuracy']:.4f}")
+        print(f"  Precision:   {metrics['precision']:.4f}")
+        print(f"  Recall:      {metrics['recall']:.4f}")
+        print(f"  F1-Score:    {metrics['f1_score']:.4f}")
+        print(f"  Specificity: {metrics['specificity']:.4f}")
+        print(f"  ROC-AUC:     {metrics['roc_auc']:.4f}")
     
-    model_path = os.path.join(config.MODEL_SAVE_DIR, "svm_model.pkl")
-    trainer.save_model(model_path)
+    def predict(self, X):
+        """Predict classes."""
+        return self.model.predict(X)
     
-    joblib.dump(preprocessor, config.PREPROCESSOR_PATH)
-    print(f"预处理器已保存至: {config.PREPROCESSOR_PATH}")
+    def predict_proba(self, X):
+        """Predict probabilities."""
+        return self.model.predict_proba(X)
     
-    # 8. 绘制并保存混淆矩阵
-    print("\n" + "="*50)
-    print("生成可视化图表...")
-    print("="*50)
+    def save_model(self, filepath):
+        """Save the model."""
+        joblib.dump(self.model.model, filepath)
+        print(f"Model saved to: {filepath}")
     
-    os.makedirs(config.FIGURE_SAVE_DIR, exist_ok=True)
+    def load_model(self, filepath):
+        """Load the model."""
+        self.model.model = joblib.load(filepath)
+        return self
     
-    # 验证集混淆矩阵
-    val_pred = trainer.predict(X_val)
-    confusion_matrix_path = os.path.join(config.FIGURE_SAVE_DIR, "confusion_matrix_val.png")
-    trainer.plot_confusion_matrix(y_val, val_pred, 
-                                 save_path=confusion_matrix_path,
-                                 title='SVM Validation Confusion Matrix')
+    def plot_confusion_matrix(self, y_true, y_pred, save_path=None, title='Confusion Matrix'):
+        """Plot confusion matrix."""
+        cm = confusion_matrix(y_true, y_pred)
+        plt.figure(figsize=(8, 6))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+        plt.title(title)
+        plt.ylabel('True Label')
+        plt.xlabel('Predicted Label')
+        
+        if save_path:
+            plt.savefig(save_path, dpi=150, bbox_inches='tight')
+            print(f"Confusion matrix saved: {save_path}")
+        plt.close()
     
-    # 9. 绘制并保存ROC曲线
-    train_pred_proba = trainer.predict_proba(X_train)[:, 1]
-    val_pred_proba = trainer.predict_proba(X_val)[:, 1]
+    def plot_roc_curve(self, y_true_train, y_score_train, y_true_val=None, 
+                       y_score_val=None, save_path=None):
+        """Plot ROC curve."""
+        plt.figure(figsize=(10, 8))
+        
+        # Train ROC
+        fpr_train, tpr_train, _ = roc_curve(y_true_train, y_score_train)
+        roc_auc_train = auc(fpr_train, tpr_train)
+        plt.plot(fpr_train, tpr_train, 
+                label=f'Train ROC (AUC = {roc_auc_train:.4f})', linewidth=2)
+        
+        # Validation ROC
+        if y_true_val is not None and y_score_val is not None:
+            fpr_val, tpr_val, _ = roc_curve(y_true_val, y_score_val)
+            roc_auc_val = auc(fpr_val, tpr_val)
+            plt.plot(fpr_val, tpr_val, 
+                    label=f'Val ROC (AUC = {roc_auc_val:.4f})', linewidth=2)
+        
+        plt.plot([0, 1], [0, 1], 'k--', label='Random Classifier')
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('SVM ROC Curve')
+        plt.legend(loc='lower right')
+        plt.grid(True, alpha=0.3)
+        
+        if save_path:
+            plt.savefig(save_path, dpi=150, bbox_inches='tight')
+            print(f"ROC curve saved: {save_path}")
+        plt.close()
     
-    trainer.plot_roc_curve(
-        y_train, train_pred_proba,
-        y_val, val_pred_proba,
-        save_path=config.ROC_CURVE_PATH
-    )
-    
-    # 10. 总结
-    print("\n" + "="*60)
-    print("训练流程总结")
-    print("="*60)
-    print(f"模型保存路径: {model_path}")
-    print(f"预处理器保存路径: {config.PREPROCESSOR_PATH}")
-    print(f"ROC曲线保存路径: {config.ROC_CURVE_PATH}")
-    print(f"混淆矩阵保存路径: {confusion_matrix_path}")
-    print(f"\n训练集 AUC: {history['train']['auc']:.4f}")
-    print(f"验证集 AUC: {history['val']['auc']:.4f}")
-    print(f"验证集 F1 Score: {history['val']['f1']:.4f}")
-    print(f"支持向量数量: {len(trainer.model.support_)}")
-    print("\n训练完成！")
-
-if __name__ == "__main__":
-    main()
+    def plot_training_history(self):
+        """Plot training metrics comparison."""
+        if self.train_metrics is None:
+            print("Please train the model first.")
+            return
+        
+        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+        
+        # Metrics comparison bar chart
+        metrics_names = ['accuracy', 'precision', 'recall', 'f1_score', 'roc_auc']
+        train_values = [self.train_metrics[m] for m in metrics_names]
+        
+        x = np.arange(len(metrics_names))
+        width = 0.35
+        
+        axes[0].bar(x - width/2, train_values, width, label='Train', alpha=0.8)
+        
+        if self.val_metrics is not None:
+            val_values = [self.val_metrics[m] for m in metrics_names]
+            axes[0].bar(x + width/2, val_values, width, label='Val', alpha=0.8)
+        
+        axes[0].set_ylabel('Score')
+        axes[0].set_title('Training vs Validation Metrics')
+        axes[0].set_xticks(x)
+        axes[0].set_xticklabels(metrics_names, rotation=45)
+        axes[0].legend()
+        axes[0].grid(True, alpha=0.3)
+        axes[0].set_ylim([0, 1])
+        
+        # Confusion matrix metrics
+        if self.val_metrics is not None:
+            metrics = self.val_metrics
+            title = 'Validation Confusion Metrics'
+        else:
+            metrics = self.train_metrics
+            title = 'Training Confusion Metrics'
+        
+        cm_values = [metrics['tp'], metrics['fp'], metrics['fn'], metrics['tn']]
+        cm_labels = ['TP', 'FP', 'FN', 'TN']
+        colors = ['green', 'orange', 'red', 'blue']
+        
+        axes[1].bar(cm_labels, cm_values, color=colors, alpha=0.7)
+        axes[1].set_ylabel('Count')
+        axes[1].set_title(title)
+        axes[1].grid(True, alpha=0.3)
+        
+        plt.tight_layout()
+        plt.savefig('svm_model\\outputs\\training_history.png', dpi=150)
+        print("\nTraining history saved: svm_model\\outputs\\training_history.png")
+        
+        return fig

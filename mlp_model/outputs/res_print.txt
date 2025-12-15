@@ -1,0 +1,111 @@
+============================================================
+High Risk Customer Prediction - MLP Deep Learning Model
+============================================================
+Loading data: train.csv
+Data shape: (80000, 51)
+Loading data: test.csv
+Data shape: (20000, 50)
+
+Starting training data preprocessing...
+Original data shape: (80000, 51)
+After removing samples with >50% missing variables: (80000, 51)
+Final feature count: 40
+Feature shape: (80000, 40), Label shape: (80000,)
+Positive sample ratio: 0.3683
+Negative sample ratio: 0.6318
+
+Dataset split:
+Training set: (64000, 40), Positive ratio: 0.3683
+Validation set: (16000, 40), Positive ratio: 0.3683
+
+Starting model training...
+Training samples: 64000, Validation samples: 16000
+Epoch [5/100] - Train Loss: 0.0255, Val Loss: 0.0252, Val AUC: 0.8940
+Epoch [10/100] - Train Loss: 0.0251, Val Loss: 0.0252, Val AUC: 0.8941
+Epoch [15/100] - Train Loss: 0.0249, Val Loss: 0.0253, Val AUC: 0.8932
+
+Early stopping at epoch 18
+
+Training completed! Best validation AUC: 0.8945
+
+Training set evaluation results:
+  Accuracy:    0.8275
+  Precision:   0.8085
+  Recall:      0.6967
+  F1-Score:    0.7484
+  Specificity: 0.9038
+  ROC-AUC:     0.8992
+
+============================================================
+Validation set detailed evaluation:
+============================================================
+
+Finding best classification threshold...
+Best F1 threshold: 0.4141, F1-Score: 0.7558
+
+Using threshold 0.5:
+  Accuracy:    0.8229
+  Precision:   0.8038
+  Recall:      0.6869
+  F1-Score:    0.7407
+  Specificity: 0.9023
+  ROC AUC:     0.8945
+  PR AUC:      0.8514
+
+Using best threshold 0.4141:
+  Accuracy:    0.7986
+  Precision:   0.6828
+  Recall:      0.8464
+  F1-Score:    0.7558
+  Specificity: 0.7708
+
+Confusion Matrix (Threshold=0.5):
+[[9120  988]
+ [1845 4047]]
+
+  TN: 9120, FP: 988
+  FN: 1845, TP: 4047
+
+Classification Report (Threshold=0.5):
+              precision    recall  f1-score   support
+
+    Low Risk       0.83      0.90      0.87     10108
+   High Risk       0.80      0.69      0.74      5892
+
+    accuracy                           0.82     16000
+   macro avg       0.82      0.79      0.80     16000
+weighted avg       0.82      0.82      0.82     16000
+
+
+ROC curve saved to: mlp_model\outputs\roc_curve.png
+PR curve saved to: mlp_model\outputs\pr_curve.png
+F1 threshold plot saved to: mlp_model\outputs\f1_threshold.png
+Confusion matrix saved to: mlp_model\outputs\confusion_matrix.png
+
+Training history plot saved to:  mlp_model\outputs\training_history.png
+
+============================================================
+Test set prediction:
+============================================================
+
+Starting test data preprocessing...
+Test set feature shape: (20000, 40)
+Prediction completed, samples: 20000
+Predicted high risk ratio (threshold=0.5): 0.3181
+Predicted high risk ratio (best threshold=0.414): 0.4575
+Predicted probability range: [0.0788, 0.9846]
+
+Prediction results saved to: mlp_model\outputs\result.csv
+File format: 20000 rows x 1 column
+Model saved to: mlp_model\outputs\mlp_model_final.pth
+
+============================================================
+Final Summary:
+============================================================
+Best ROC AUC:     0.8945
+Best F1-Score:    0.7558 (Threshold=0.414)
+Validation Precision: 0.6828
+Validation Recall:    0.8464
+============================================================
+
+All tasks completed!

@@ -1,0 +1,137 @@
+============================================================
+High Risk Customer Prediction - Logistic Regression Model
+============================================================
+Loading data: train.csv
+Data shape: (80000, 51)
+Loading data: test.csv
+Data shape: (20000, 50)
+
+Start preprocessing training data...
+Original data shape: (80000, 51)
+After removing samples with missing variables > 50%: (80000, 51)
+Final feature count: 40
+Feature shape: (80000, 40), Label shape: (80000,)
+Positive sample ratio: 0.3683
+Negative sample ratio: 0.6318
+
+Dataset Split:
+Training set: (56000, 40), Positive sample ratio: 0.3683
+Validation set: (24000, 40), Positive sample ratio: 0.3683
+
+Starting Logistic Regression model training...
+Training set: 56000, Validation set: 24000
+
+Training set evaluation results:
+  Accuracy:    0.4388
+  Precision:   0.3960
+  Recall:      0.9981
+  F1-Score:    0.5671
+  Specificity: 0.1128
+  ROC-AUC:     0.8945
+
+Validation set evaluation results:
+  Accuracy:    0.4368
+  Precision:   0.3951
+  Recall:      0.9977
+  F1-Score:    0.5661
+  Specificity: 0.1097
+  ROC-AUC:     0.8932
+
+============================================================
+Validation Set Detailed Evaluation:
+============================================================
+
+Finding best classification threshold...
+Best F1 Threshold: 0.9697, F1-Score: 0.7564
+
+Using Threshold 0.5:
+  Accuracy:    0.4368
+  Precision:   0.3951
+  Recall:      0.9977
+  F1-Score:    0.5661
+  Specificity: 0.1097
+  ROC AUC:     0.8932
+  PR AUC:      0.8474
+
+Using Best Threshold 0.9697:
+  Accuracy:    0.8142
+  Precision:   0.7314
+  Recall:      0.7831
+  F1-Score:    0.7564
+  Specificity: 0.8323
+
+Confusion Matrix (Threshold=0.5):
+[[ 1664 13498]
+ [   20  8818]]
+
+  TN: 1664, FP: 13498
+  FN: 20, TP: 8818
+
+Classification Report (Threshold=0.5):
+              precision    recall  f1-score   support
+
+    Low Risk       0.99      0.11      0.20     15162
+   High Risk       0.40      1.00      0.57      8838
+
+    accuracy                           0.44     24000
+   macro avg       0.69      0.55      0.38     24000
+weighted avg       0.77      0.44      0.33     24000
+
+
+ROC Curve saved: logistic_model\outputs\roc_curve.png
+PR Curve saved: logistic_model\outputs\pr_curve.png
+F1 Threshold Plot saved: logistic_model\outputs\f1_threshold.png
+Confusion Matrix saved: logistic_model\outputs\confusion_matrix.png
+
+==================================================
+Top 20 Important Features (sorted by absolute coefficient):
+==================================================
+ 1. 收缩压                                     : 1.287085
+ 2. 心理健康问题                                  : 0.726393
+ 3. 关节炎                                     : 0.642777
+ 4. 糖尿病                                     : 0.586688
+ 5. 年度医疗费用                                  : 0.559974
+ 6. 哮喘                                      : 0.483683
+ 7. 心血管疾病                                   : 0.458466
+ 8. 舒张压                                     : 0.432926
+ 9. 慢性阻塞性肺病                                 : 0.373180
+10. 癌症病史                                    : 0.283772
+11. BMI                                     : 0.261919
+12. 肝脏疾病                                    : 0.255294
+13. 肾脏疾病                                    : 0.249144
+14. 理赔总额                                    : -0.114569
+15. 近3年住院天数                                 : -0.082198
+16. 低密度脂蛋白                                  : 0.079610
+17. 理赔次数                                    : 0.077260
+18. 去年就诊次数                                  : -0.062201
+19. 高血压                                     : -0.049045
+20. 糖化血红蛋白                                  : 0.036264
+
+Training history saved to: logistic_model\outputs\training_history.png
+
+============================================================
+Test Set Prediction:
+============================================================
+
+Start preprocessing test data...
+Test set feature shape: (20000, 40)
+Prediction complete, number of samples: 20000
+Predicted High Risk Ratio (Threshold=0.5): 0.9295
+Predicted High Risk Ratio (Best Threshold=0.970): 0.3932
+Predicted Probability Range: [0.0395, 1.0000]
+
+Results saved: logistic_model\outputs\result.csv
+File format: 20000 rows × 1 col
+Model saved to: logistic_model\outputs\logistic_model_final.pkl
+Preprocessor saved: logistic_model\outputs\preprocessor.pkl
+
+============================================================
+Final Summary:
+============================================================
+Best ROC AUC:     0.8932
+Best F1-Score:    0.7564 (Threshold=0.970)
+Validation Precision: 0.7314
+Validation Recall:    0.7831
+============================================================
+
+All tasks completed!

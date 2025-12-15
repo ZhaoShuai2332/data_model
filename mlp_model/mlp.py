@@ -2,7 +2,12 @@ import torch
 import torch.nn as nn
 
 """
-主要对多层感知机（MLP）用于风险预测进行定义
+Definition of Multi-Layer Perceptron (MLP) for risk prediction
+
+References:
+    [1] Hinton, G. E. (1989). Connectionist learning procedures. Artificial intelligence, 40(1-3), 185-234.
+    [2] Lin, T. Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2017). Focal loss for dense object detection.
+        In Proceedings of the IEEE international conference on computer vision (pp. 2980-2988).
 """
 class RiskPredictionNet(nn.Module):
     
@@ -12,7 +17,7 @@ class RiskPredictionNet(nn.Module):
         layers = []
         prev_dim = input_dim
         
-        # 构建隐藏层
+        # Build hidden layers
         for hidden_dim in hidden_dims:
             layers.append(nn.Linear(prev_dim, hidden_dim))
             layers.append(nn.BatchNorm1d(hidden_dim))
@@ -30,9 +35,9 @@ class RiskPredictionNet(nn.Module):
             
             prev_dim = hidden_dim
         
-        # 输出层
+        # Output layer
         layers.append(nn.Linear(prev_dim, 1))
-        # 使用Sigmoid激活函数输出概率
+        # Use Sigmoid activation function to output probability
         layers.append(nn.Sigmoid())
         
         self.network = nn.Sequential(*layers)
@@ -43,8 +48,8 @@ class RiskPredictionNet(nn.Module):
 
 class FocalLoss(nn.Module):
     """
-    Focal Loss用于处理类别不平衡问题
-    参考: https://arxiv.org/abs/1708.02002
+    Focal Loss for handling class imbalance problems
+    Reference: https://arxiv.org/abs/1708.02002
     """
     
     def __init__(self, alpha=0.25, gamma=2.0):

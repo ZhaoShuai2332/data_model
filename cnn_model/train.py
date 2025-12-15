@@ -8,13 +8,13 @@ import torch.optim as optim
 import numpy as np
 
 
-# 采用GPU对torch的网络模型进行加速训练
+# Use GPU for torch network model acceleration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print(f"使用设备: {device}")
+print(f"Using device: {device}")
 
 
 class ResNetPredictor:
-    """ResNet训练器 with F1-score"""
+    """ResNet trainer with F1-score"""
     
     def __init__(self, input_dim, layers=[2, 2, 2, 2], 
                  channels=[64, 128, 256, 512],
@@ -75,7 +75,7 @@ class ResNetPredictor:
         all_labels = np.array(all_labels)
         all_preds = (all_probs >= threshold).astype(int)
         
-        # 计算所有指标
+        # Calculate all metrics
         metrics = self.metrics_calculator.calculate_metrics(
             all_labels, all_preds, all_probs, threshold
         )
@@ -99,8 +99,8 @@ class ResNetPredictor:
         train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
         val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
         
-        print(f"\n开始训练ResNet1D模型...")
-        print(f"训练集: {len(X_train)}, 验证集: {len(X_val)}")
+        print(f"\nStart training ResNet1D model...")
+        print(f"Training set: {len(X_train)}, Validation set: {len(X_val)}")
         
         best_f1 = 0
         best_auc = 0
@@ -122,7 +122,7 @@ class ResNetPredictor:
                       f"Val AUC: {metrics['roc_auc']:.4f}, "
                       f"Val F1: {metrics['f1_score']:.4f}")
             
-            # 同时考虑AUC和F1-score
+            # Consider both AUC and F1-score
             if metrics['f1_score'] > best_f1 or metrics['roc_auc'] > best_auc:
                 best_f1 = max(best_f1, metrics['f1_score'])
                 best_auc = max(best_auc, metrics['roc_auc'])
@@ -136,7 +136,7 @@ class ResNetPredictor:
                 break
         
         self.model.load_state_dict(torch.load('cnn_model\\outputs\\best_resnet1d_model.pth'))
-        print(f"\n训练完成！最佳AUC: {best_auc:.4f}, 最佳F1: {best_f1:.4f}")
+        print(f"\nTraining completed! Best AUC: {best_auc:.4f}, Best F1: {best_f1:.4f}")
         
         return best_auc, best_f1
     
@@ -157,7 +157,7 @@ class ResNetPredictor:
     def plot_training_history(self):
         fig, axes = plt.subplots(1, 3, figsize=(18, 5))
         
-        # Loss曲线
+        # Loss Curve
         axes[0].plot(self.train_losses, label='Train Loss')
         axes[0].plot(self.val_losses, label='Val Loss')
         axes[0].set_xlabel('Epoch')
@@ -166,7 +166,7 @@ class ResNetPredictor:
         axes[0].legend()
         axes[0].grid(True, alpha=0.3)
         
-        # AUC曲线
+        # AUC Curve
         axes[1].plot(self.val_aucs, color='green', label='Val AUC')
         axes[1].set_xlabel('Epoch')
         axes[1].set_ylabel('AUC')
@@ -174,7 +174,7 @@ class ResNetPredictor:
         axes[1].legend()
         axes[1].grid(True, alpha=0.3)
         
-        # F1曲线
+        # F1 Curve
         axes[2].plot(self.val_f1s, color='orange', label='Val F1-Score')
         axes[2].set_xlabel('Epoch')
         axes[2].set_ylabel('F1-Score')
@@ -184,5 +184,5 @@ class ResNetPredictor:
         
         plt.tight_layout()
         plt.savefig('cnn_model\\outputs\\training_history.png', dpi=150)
-        print("\n训练历史已保存: cnn_model\\outputs\\training_history.png")
+        print("\nTraining history saved: cnn_model\\outputs\\training_history.png")
         return fig

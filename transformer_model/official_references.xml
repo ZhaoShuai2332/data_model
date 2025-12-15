@@ -1,14 +1,9 @@
-import zipfile
-import os
-
-# 定义 EndNote XML 内容
-# 这种格式是 EndNote 官方的数据交换格式，导入后无损转换为 .enl
-xml_content = """<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xml>
 <records>
 
 <record>
-    <database name="EndNote Library" path="C:\\MyLibrary.enl">EndNote Library</database>
+    <database name="EndNote Library" path="C:\MyLibrary.enl">EndNote Library</database>
     <source-app name="EndNote">EndNote</source-app>
     <rec-number>1</rec-number>
     <ref-type name="Report">27</ref-type>
@@ -31,7 +26,7 @@ xml_content = """<?xml version="1.0" encoding="UTF-8"?>
 </record>
 
 <record>
-    <database name="EndNote Library" path="C:\\MyLibrary.enl">EndNote Library</database>
+    <database name="EndNote Library" path="C:\MyLibrary.enl">EndNote Library</database>
     <source-app name="EndNote">EndNote</source-app>
     <rec-number>2</rec-number>
     <ref-type name="Book">6</ref-type>
@@ -50,7 +45,7 @@ xml_content = """<?xml version="1.0" encoding="UTF-8"?>
 </record>
 
 <record>
-    <database name="EndNote Library" path="C:\\MyLibrary.enl">EndNote Library</database>
+    <database name="EndNote Library" path="C:\MyLibrary.enl">EndNote Library</database>
     <source-app name="EndNote">EndNote</source-app>
     <rec-number>3</rec-number>
     <ref-type name="Report">27</ref-type>
@@ -68,7 +63,7 @@ xml_content = """<?xml version="1.0" encoding="UTF-8"?>
 </record>
 
 <record>
-    <database name="EndNote Library" path="C:\\MyLibrary.enl">EndNote Library</database>
+    <database name="EndNote Library" path="C:\MyLibrary.enl">EndNote Library</database>
     <source-app name="EndNote">EndNote</source-app>
     <rec-number>4</rec-number>
     <ref-type name="Conference Proceedings">10</ref-type>
@@ -94,7 +89,7 @@ xml_content = """<?xml version="1.0" encoding="UTF-8"?>
 </record>
 
 <record>
-    <database name="EndNote Library" path="C:\\MyLibrary.enl">EndNote Library</database>
+    <database name="EndNote Library" path="C:\MyLibrary.enl">EndNote Library</database>
     <source-app name="EndNote">EndNote</source-app>
     <rec-number>5</rec-number>
     <ref-type name="Journal Article">17</ref-type>
@@ -119,7 +114,7 @@ xml_content = """<?xml version="1.0" encoding="UTF-8"?>
 </record>
 
 <record>
-    <database name="EndNote Library" path="C:\\MyLibrary.enl">EndNote Library</database>
+    <database name="EndNote Library" path="C:\MyLibrary.enl">EndNote Library</database>
     <source-app name="EndNote">EndNote</source-app>
     <rec-number>6</rec-number>
     <ref-type name="Journal Article">17</ref-type>
@@ -147,7 +142,7 @@ xml_content = """<?xml version="1.0" encoding="UTF-8"?>
 </record>
 
 <record>
-    <database name="EndNote Library" path="C:\\MyLibrary.enl">EndNote Library</database>
+    <database name="EndNote Library" path="C:\MyLibrary.enl">EndNote Library</database>
     <source-app name="EndNote">EndNote</source-app>
     <rec-number>7</rec-number>
     <ref-type name="Journal Article">17</ref-type>
@@ -167,7 +162,7 @@ xml_content = """<?xml version="1.0" encoding="UTF-8"?>
 </record>
 
 <record>
-    <database name="EndNote Library" path="C:\\MyLibrary.enl">EndNote Library</database>
+    <database name="EndNote Library" path="C:\MyLibrary.enl">EndNote Library</database>
     <source-app name="EndNote">EndNote</source-app>
     <rec-number>8</rec-number>
     <ref-type name="Report">27</ref-type>
@@ -186,19 +181,3 @@ xml_content = """<?xml version="1.0" encoding="UTF-8"?>
 
 </records>
 </xml>
-"""
-
-# 文件名配置
-xml_filename = "official_references.xml"
-zip_filename = "EndNote_XML_Import.zip"
-
-# 写入 XML 文件
-with open(xml_filename, "w", encoding="utf-8") as f:
-    f.write(xml_content)
-
-# 压缩为 ZIP
-with zipfile.ZipFile(zip_filename, 'w') as zipf:
-    zipf.write(xml_filename)
-
-print(f"成功生成: {zip_filename}")
-print("请在 EndNote 中使用 'Import -> EndNote generated XML' 选项导入此文件。")

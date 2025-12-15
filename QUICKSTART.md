@@ -76,14 +76,74 @@ pip install torch torchvision torchaudio
 
 ---
 
-## 🚀 3. 模型训练与评估
+## 🚀 3. 脚本快速启动
 
-所有模型均封装了 `execute.py` 作为统一执行入口。执行后将自动完成以下流程：
+项目提供了统一的模型运行脚本，可在项目根目录一键执行任意模型，**无需手动切换目录**。
+
+### 3.1 Windows 用户
+
+使用 `run_model.bat` 脚本：
+
+```powershell
+# 运行单个模型
+.\run_model.bat cnn          # 训练 CNN (ResNet1D) 模型
+.\run_model.bat mlp          # 训练 MLP 模型
+.\run_model.bat logistic     # 训练 Logistic Regression 模型
+.\run_model.bat svm          # 训练 SVM 模型
+.\run_model.bat transformer  # 训练 Transformer 模型
+
+# 运行所有模型（自动对比评估）
+.\run_model.bat all
+
+# 查看帮助信息
+.\run_model.bat help
+```
+
+### 3.2 macOS / Linux 用户
+
+使用 `run_model.sh` 脚本：
+
+```bash
+# 添加执行权限（首次运行需要）
+chmod +x run_model.sh
+
+# 运行单个模型
+./run_model.sh cnn          # 训练 CNN (ResNet1D) 模型
+./run_model.sh mlp          # 训练 MLP 模型
+./run_model.sh logistic     # 训练 Logistic Regression 模型
+./run_model.sh svm          # 训练 SVM 模型
+./run_model.sh transformer  # 训练 Transformer 模型
+
+# 运行所有模型（自动对比评估）
+./run_model.sh all
+
+# 查看帮助信息
+./run_model.sh help
+```
+
+### 3.3 可用模型参数
+
+| 参数 | 模型 | 说明 |
+|------|------|------|
+| `cnn` | CNN (ResNet1D) | 一维卷积神经网络，基于 ResNet 架构 |
+| `mlp` | Multi-Layer Perceptron | 多层感知机 |
+| `logistic` | Logistic Regression | 逻辑回归分类器 |
+| `svm` | Support Vector Machine | 支持向量机 |
+| `transformer` | Transformer | 基于自注意力机制的模型 |
+| `all` | 全部模型 | 按顺序运行所有模型并生成对比报告 |
+
+> **💡 提示**: 使用 `all` 参数运行所有模型后，脚本会自动生成执行摘要，显示每个模型的运行状态（成功/失败）。
+
+---
+
+## 📊 4. 模型训练与评估（手动方式）
+
+如果您更倾向于手动运行单个模型，所有模型均封装了 `execute.py` 作为统一执行入口。执行后将自动完成以下流程：
 1.  数据加载与清洗
 2.  模型构建与训练
 3.  验证集评估与指标输出
 
-### 3.1 深度学习模型 (SOTA)
+### 4.1 深度学习模型 (SOTA)
 
 **Transformer (Self-Attention)**
 ```bash
@@ -103,7 +163,7 @@ cd mlp_model
 python execute.py
 ```
 
-### 3.2 经典机器学习模型 (Baselines)
+### 4.2 经典机器学习模型 (Baselines)
 
 **Support Vector Machine (SVM)**
 ```bash
@@ -120,7 +180,7 @@ python execute.py
 
 ---
 
-## ❓ 常见问题 (FAQ)
+## ❓ 5. 常见问题 (FAQ)
 
 **Q1: 提示 `FileNotFoundError: [Errno 2] No such file or directory: 'train.csv'`**
 > **A**: 请检查 `train.csv` 是否确实位于项目根目录下，且文件名完全匹配（区分大小写）。
@@ -131,27 +191,5 @@ python execute.py
 **Q3: 训练过程 Loss 不下降**
 > **A**: 可能是学习率 (Learning Rate) 设置不当或数据未标准化。本项目已内置 `StandardScaler` 标准化处理，请检查是否错误修改了预处理逻辑。
 
-# 运行执行脚本
-python execute.py
-```
-
-### 3.5 运行 Transformer
-
-```bash
-# 进入模型目录
-cd transformer_model
-
-# 运行执行脚本
-python execute.py
-```
-
-## 4. 常见问题 (FAQ)
-
-**Q: 运行脚本时提示 `FileNotFoundError: [Errno 2] No such file or directory: 'train.csv'`**
-A: 请检查您是否已将 `train.csv` 和 `test.csv` 放置在正确的目录下 (建议放在项目根目录)，或在脚本中修改数据路径配置。
-
-**Q: 显存不足 (CUDA out of memory)**
-A: 请尝试在各模型的 `train.py` 或 `config` 中减小 `batch_size`。
-
-**Q: 如何查看训练结果？**
-A: 模型训练完成后，评估结果 (图片、CSV、模型权重) 通常会保存在各模型目录下的 `outputs/` 文件夹中。
+**Q4: 如何查看训练结果？**
+> **A**: 模型训练完成后，评估结果 (图片、CSV、模型权重) 通常会保存在各模型目录下的 `outputs/` 文件夹中。

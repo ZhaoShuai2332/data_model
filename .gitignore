@@ -30,3 +30,5 @@ cnn_model/__pycache__/execute.cpython-311.pyc
 transformer_model/__pycache__/data_process.cpython-311.pyc
 transformer_model/__pycache__/evaluate.cpython-311.pyc
 __pycache__/run_model.cpython-311.pyc
+feature_analysis/__pycache__/__init__.cpython-311.pyc
+feature_analysis/__pycache__/feature_importance_analysis.cpython-311.pyc
